@@ -55,4 +55,4 @@ def displayBoard(screen):
                 rect.topleft=(x_pos+5,y_pos+5)
                 screen.blit(image,rect)
 
-    pygame.display.update()
+   
