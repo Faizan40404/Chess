@@ -11,12 +11,16 @@ screen=pygame.display.set_mode((width,height))
 pygame.display.set_caption('Shatranj')
 
 GUI.displayBoard(screen)
-
+selected=tuple()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            selected=GUI.selectPiece(screen)
+            print(selected)
+
 
     pygame.display.update()
 
