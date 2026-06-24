@@ -18,8 +18,7 @@ while True:
             pygame.quit()
             exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
-            selected=GUI.selectPiece(screen)
-            print(selected)
+            selected=GUI.selections(screen,selected)
 
 
     pygame.display.update()

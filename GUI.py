@@ -75,23 +75,41 @@ def displayBoard(screen):
                 piece.drawPiece(screen)
 
 
-def selectPiece(screen):
+def deSelectPiece(screen,cell_x,cell_y):
+    pieceSymbol=board[cell_y][cell_x]
+    if (cell_x+cell_y)%2:
+        screen.blit(black_box,(cell_x*box_size,cell_y*box_size))
+    else:
+        screen.blit(white_box,(cell_x*box_size,cell_y*box_size))
+    piece = pieces[pieceSymbol]
+    piece.move_to(cell_x,cell_y)
+    piece.drawPiece(screen)
+
+def selectPiece(screen,cell_x,cell_y):
+    pieceSymbol=board[cell_y][cell_x]
+    if pieceSymbol != '':
+        if (cell_x+cell_y)%2:
+            screen.blit(black_selected_box,(cell_x*box_size,cell_y*box_size))
+        else:
+            screen.blit(white_selected_box,(cell_x*box_size,cell_y*box_size))
+        piece = pieces[pieceSymbol]
+        piece.move_to(cell_x,cell_y)
+        piece.drawPiece(screen)
+        return cell_x,cell_y
+
+def selections(screen,selected):
     mouse_x, mouse_y=pygame.mouse.get_pos()
-
-    if mouse_y < 600 and mouse_x<600:
-        cell_y=int(mouse_y / box_size)
-        cell_x=int(mouse_x / box_size)
-        pieceSymbol=board[cell_y][cell_x]
-        if pieceSymbol != '':
-            if (cell_x+cell_y)%2:
-                screen.blit(white_selected_box,(cell_x*box_size,cell_y*box_size))
-            else:
-                screen.blit(black_selected_box,(cell_x*box_size,cell_y*box_size))
-            piece = pieces[pieceSymbol]
-            piece.move_to(cell_x,cell_y)
-            piece.drawPiece(screen)
-            return cell_x,cell_y
-        return None
-    return None
-
-    
+    cell_y=int(mouse_y / box_size)
+    cell_x=int(mouse_x / box_size)
+    if cell_x < 8 and cell_y<8:
+        if not selected:
+           return selectPiece(screen,cell_x,cell_y)
+        elif (cell_x,cell_y) == selected:
+            deSelectPiece(screen,cell_x,cell_y)
+            return None
+        else:
+            old_x,old_y=selected
+            deSelectPiece(screen,old_x,old_y)
+            return selectPiece(screen,cell_x,cell_y)
+            
+    return None   
