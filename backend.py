@@ -34,7 +34,7 @@ def getBishopMoves(board, bishopLocation):
                 enemy.append((mark_x,mark_y))
     return empty,enemy
 
-def getBishopLegalMoves(board,bishopLocation):
+def getBishopPsuedolegalMoves(board,bishopLocation):
     enemy,empty=getBishopMoves(board,bishopLocation)
     return enemy+empty
 
@@ -55,6 +55,6 @@ def getRookMoves(board, rookLocation):
                 enemy.append((mark_x,mark_y))
     return empty,enemy
 
-def getRookLegalMoves(board,rookLocation):
+def getRookPsuedolegalMoves(board,rookLocation):
     enemy,empty=getRookMoves(board,rookLocation)
     return enemy+empty
