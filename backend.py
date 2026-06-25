@@ -58,3 +58,24 @@ def getRookMoves(board, rookLocation):
 def getRookPsuedolegalMoves(board,rookLocation):
     enemy,empty=getRookMoves(board,rookLocation)
     return enemy+empty
+
+def getQueenMoves(board, queenLocation):
+    empty=[]
+    enemy=[]
+    for direction in [(1,0),(-1,0),(0,1),(0,-1),(1,1),(1,-1),(-1,-1),(-1,1)]:
+        mark_x,mark_y=queenLocation
+        dx,dy=direction
+        mark_x+=dx
+        mark_y+=dy
+        while checkValidCoordinates(mark_x,mark_y) and len(board[mark_y][mark_x])==0 :
+           empty.append((mark_x,mark_y))
+           mark_x+=dx
+           mark_y+=dy
+        if checkValidCoordinates(mark_x,mark_y):
+            if not checkFriendly(board,queenLocation,(mark_x,mark_y)):
+                enemy.append((mark_x,mark_y))
+    return empty,enemy
+
+def getQueenPsuedolegalMoves(board,queenLocation):
+    enemy,empty=getRookMoves(board,queenLocation)
+    return enemy+empty

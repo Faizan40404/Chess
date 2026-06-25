@@ -131,6 +131,8 @@ def selectPiece(screen,cell_x,cell_y):
             showBishopMoves(screen,(cell_x,cell_y))
         if board[cell_y][cell_x][1]=='r':
             showRookMoves(screen,(cell_x,cell_y))
+        if board[cell_y][cell_x][1]=='q':
+            showQueenMoves(screen,(cell_x,cell_y))
         return cell_x,cell_y
 
 def selections(screen,selected):
@@ -180,6 +182,19 @@ def showBishopMoves(screen,bishopLocation):
 
 def showRookMoves(screen,rookLocation):
     empty_cell,enemy_cell=backend.getRookMoves(board,rookLocation)
+    for cell in empty_cell:
+        empty_x,empty_y=cell
+        drawBox(screen,empty_x,empty_y,SquareState.MOVE)
+    for cell in enemy_cell:
+        enemy_x,enemy_y=cell
+        pieceSymbol=board[enemy_y][enemy_x]
+        drawBox(screen,enemy_x,enemy_y,SquareState.THREAT)
+        piece=pieces[pieceSymbol]
+        piece.move_to(enemy_x,enemy_y)
+        piece.drawPiece(screen)
+
+def showQueenMoves(screen,rookLocation):
+    empty_cell,enemy_cell=backend.getQueenMoves(board,rookLocation)
     for cell in empty_cell:
         empty_x,empty_y=cell
         drawBox(screen,empty_x,empty_y,SquareState.MOVE)
