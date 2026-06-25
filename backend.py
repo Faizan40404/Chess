@@ -1,4 +1,4 @@
-import pygame
+from enum import Enum
 
 def movePiece(board, current_loc, next_loc):
     curr_x,curr_y=current_loc
@@ -17,11 +17,11 @@ def checkValidCoordinates(x,y):
         return False
     return True
 
-def getBishopMoves(board, bishopLocation):
+def getMovesForBasicPieces(board, pieceLocation, directionList):
     empty=[]
     enemy=[]
-    for direction in [(1,1),(1,-1),(-1,-1),(-1,1)]:
-        mark_x,mark_y=bishopLocation
+    for direction in directionList:
+        mark_x,mark_y=pieceLocation
         dx,dy=direction
         mark_x+=dx
         mark_y+=dy
@@ -30,51 +30,30 @@ def getBishopMoves(board, bishopLocation):
            mark_x+=dx
            mark_y+=dy
         if checkValidCoordinates(mark_x,mark_y):
-            if not checkFriendly(board,bishopLocation,(mark_x,mark_y)):
+            if not checkFriendly(board,pieceLocation,(mark_x,mark_y)):
                 enemy.append((mark_x,mark_y))
     return empty,enemy
+
+
+def getBishopMoves(board, bishopLocation):
+    directions=[(1,1),(1,-1),(-1,-1),(-1,1)]
+    return getMovesForBasicPieces(board,bishopLocation,directions)
 
 def getBishopPsuedolegalMoves(board,bishopLocation):
     enemy,empty=getBishopMoves(board,bishopLocation)
     return enemy+empty
 
 def getRookMoves(board, rookLocation):
-    empty=[]
-    enemy=[]
-    for direction in [(1,0),(-1,0),(0,1),(0,-1)]:
-        mark_x,mark_y=rookLocation
-        dx,dy=direction
-        mark_x+=dx
-        mark_y+=dy
-        while checkValidCoordinates(mark_x,mark_y) and len(board[mark_y][mark_x])==0 :
-           empty.append((mark_x,mark_y))
-           mark_x+=dx
-           mark_y+=dy
-        if checkValidCoordinates(mark_x,mark_y):
-            if not checkFriendly(board,rookLocation,(mark_x,mark_y)):
-                enemy.append((mark_x,mark_y))
-    return empty,enemy
+    directions=[(1,0),(-1,0),(0,1),(0,-1)]
+    return getMovesForBasicPieces(board,rookLocation,directions)
 
 def getRookPsuedolegalMoves(board,rookLocation):
     enemy,empty=getRookMoves(board,rookLocation)
     return enemy+empty
 
 def getQueenMoves(board, queenLocation):
-    empty=[]
-    enemy=[]
-    for direction in [(1,0),(-1,0),(0,1),(0,-1),(1,1),(1,-1),(-1,-1),(-1,1)]:
-        mark_x,mark_y=queenLocation
-        dx,dy=direction
-        mark_x+=dx
-        mark_y+=dy
-        while checkValidCoordinates(mark_x,mark_y) and len(board[mark_y][mark_x])==0 :
-           empty.append((mark_x,mark_y))
-           mark_x+=dx
-           mark_y+=dy
-        if checkValidCoordinates(mark_x,mark_y):
-            if not checkFriendly(board,queenLocation,(mark_x,mark_y)):
-                enemy.append((mark_x,mark_y))
-    return empty,enemy
+    directions = [(1,0),(-1,0),(0,1),(0,-1),(1,1),(1,-1),(-1,-1),(-1,1)]
+    return getMovesForBasicPieces(board,queenLocation,directions)
 
 def getQueenPsuedolegalMoves(board,queenLocation):
     enemy,empty=getRookMoves(board,queenLocation)

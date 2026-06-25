@@ -128,11 +128,11 @@ def selectPiece(screen,cell_x,cell_y):
         piece.move_to(cell_x,cell_y)
         piece.drawPiece(screen)
         if board[cell_y][cell_x][1]=='b':
-            showBishopMoves(screen,(cell_x,cell_y))
+            showPieceMoves(screen,(cell_x,cell_y),backend.getBishopMoves)
         if board[cell_y][cell_x][1]=='r':
-            showRookMoves(screen,(cell_x,cell_y))
+            showPieceMoves(screen,(cell_x,cell_y),backend.getRookMoves)
         if board[cell_y][cell_x][1]=='q':
-            showQueenMoves(screen,(cell_x,cell_y))
+            showPieceMoves(screen,(cell_x,cell_y),backend.getQueenMoves)
         return cell_x,cell_y
 
 def selections(screen,selected):
@@ -166,35 +166,9 @@ def movePiece(screen,current_loc, next_loc):
     piece.move_to(next_x,next_y)
     piece.drawPiece(screen)
     backend.movePiece(board,current_loc,next_loc)
-    
-def showBishopMoves(screen,bishopLocation):
-    empty_cell,enemy_cell=backend.getBishopMoves(board,bishopLocation)
-    for cell in empty_cell:
-        empty_x,empty_y=cell
-        drawBox(screen,empty_x,empty_y,SquareState.MOVE)
-    for cell in enemy_cell:
-        enemy_x,enemy_y=cell
-        pieceSymbol=board[enemy_y][enemy_x]
-        drawBox(screen,enemy_x,enemy_y,SquareState.THREAT)
-        piece=pieces[pieceSymbol]
-        piece.move_to(enemy_x,enemy_y)
-        piece.drawPiece(screen)
 
-def showRookMoves(screen,rookLocation):
-    empty_cell,enemy_cell=backend.getRookMoves(board,rookLocation)
-    for cell in empty_cell:
-        empty_x,empty_y=cell
-        drawBox(screen,empty_x,empty_y,SquareState.MOVE)
-    for cell in enemy_cell:
-        enemy_x,enemy_y=cell
-        pieceSymbol=board[enemy_y][enemy_x]
-        drawBox(screen,enemy_x,enemy_y,SquareState.THREAT)
-        piece=pieces[pieceSymbol]
-        piece.move_to(enemy_x,enemy_y)
-        piece.drawPiece(screen)
-
-def showQueenMoves(screen,rookLocation):
-    empty_cell,enemy_cell=backend.getQueenMoves(board,rookLocation)
+def showPieceMoves(screen,pieceLocation, getPieceMoves):
+    empty_cell,enemy_cell=getPieceMoves(board,pieceLocation)
     for cell in empty_cell:
         empty_x,empty_y=cell
         drawBox(screen,empty_x,empty_y,SquareState.MOVE)
