@@ -1,4 +1,5 @@
 import pygame
+import backend
 
 board = [
     ["br","bn","bb","bq","bk","bb","bn","br"],
@@ -58,16 +59,22 @@ def loadPieces():
 
 pieces=loadPieces()
 
+def drawBox(screen,x,y,selected):
+    if not selected:
+        if (x+y) % 2:
+            screen.blit(black_box,(x*box_size,y*box_size))
+        else:
+            screen.blit(white_box,(x*box_size,y*box_size))
+    else:
+        if (x+y) % 2:
+            screen.blit(black_selected_box,(x*box_size,y*box_size))
+        else:
+            screen.blit(white_selected_box,(x*box_size,y*box_size))
+
 def displayBoard(screen):
     for i in range(8):
         for j in range(8):
-            x_pos=j*box_size
-            y_pos=i*box_size
-            if (i+j) % 2:
-                screen.blit(black_box,(x_pos,y_pos))
-            else:
-                screen.blit(white_box,(x_pos,y_pos))
-
+            drawBox(screen,j,i,False)
             pieceSymbol=board[i][j]
             if pieceSymbol != '':
                 piece=pieces[pieceSymbol]
@@ -77,10 +84,7 @@ def displayBoard(screen):
 
 def deSelectPiece(screen,cell_x,cell_y):
     pieceSymbol=board[cell_y][cell_x]
-    if (cell_x+cell_y)%2:
-        screen.blit(black_box,(cell_x*box_size,cell_y*box_size))
-    else:
-        screen.blit(white_box,(cell_x*box_size,cell_y*box_size))
+    drawBox(screen,cell_x,cell_y,False)
     piece = pieces[pieceSymbol]
     piece.move_to(cell_x,cell_y)
     piece.drawPiece(screen)
@@ -88,10 +92,7 @@ def deSelectPiece(screen,cell_x,cell_y):
 def selectPiece(screen,cell_x,cell_y):
     pieceSymbol=board[cell_y][cell_x]
     if pieceSymbol != '':
-        if (cell_x+cell_y)%2:
-            screen.blit(black_selected_box,(cell_x*box_size,cell_y*box_size))
-        else:
-            screen.blit(white_selected_box,(cell_x*box_size,cell_y*box_size))
+        drawBox(screen,cell_x,cell_y,True)
         piece = pieces[pieceSymbol]
         piece.move_to(cell_x,cell_y)
         piece.drawPiece(screen)
@@ -110,6 +111,22 @@ def selections(screen,selected):
         else:
             old_x,old_y=selected
             deSelectPiece(screen,old_x,old_y)
-            return selectPiece(screen,cell_x,cell_y)
+            if  len(board[cell_y][cell_x])>0 and board[cell_y][cell_x][0] == board[old_y][old_x][0]: 
+                return selectPiece(screen,cell_x,cell_y)
+            else:
+                movePiece(screen,selected,(cell_x,cell_y))
+                return None
             
-    return None   
+    return None  
+
+def movePiece(screen,current_loc, next_loc):
+    curr_x,curr_y=current_loc
+    drawBox(screen,curr_x,curr_y,False)
+    pieceSymbol = board[curr_y][curr_x]
+    next_x,next_y=next_loc
+    drawBox(screen,next_x,next_y,False)
+    piece=pieces[pieceSymbol]
+    piece.move_to(next_x,next_y)
+    piece.drawPiece(screen)
+    backend.movePiece(board,current_loc,next_loc)
+    
