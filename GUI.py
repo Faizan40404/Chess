@@ -1,5 +1,6 @@
 import pygame
 import backend
+from enum import Enum
 
 board = [
     ["br","bn","bb","bq","bk","bb","bn","br"],
@@ -14,11 +15,17 @@ board = [
 
 box_size=75
 
-white = (240, 217, 181) 
-black  = (181, 136, 99)
+white = (240, 217, 181)
+black = (181, 136, 99)
 
 white_selected = (246, 246, 105)
 black_selected = (186, 202, 68)
+
+white_move = (170, 215, 255)
+black_move = (90, 170, 230)
+
+white_threat = (255, 160, 160)
+black_threat = (200, 80, 80)
 
 black_box=pygame.Surface((box_size,box_size))
 black_box.fill(black)
@@ -26,11 +33,29 @@ black_box.fill(black)
 black_selected_box=pygame.Surface((box_size,box_size))
 black_selected_box.fill(black_selected)
 
+black_move_box=pygame.Surface((box_size,box_size))
+black_move_box.fill(black_move)
+
+black_threat_box=pygame.Surface((box_size,box_size))
+black_threat_box.fill(black_threat)
+
 white_box=pygame.Surface((box_size,box_size))
 white_box.fill(white)
 
 white_selected_box=pygame.Surface((box_size,box_size))
 white_selected_box.fill(white_selected)
+
+white_move_box=pygame.Surface((box_size,box_size))
+white_move_box.fill(white_move)
+
+white_threat_box=pygame.Surface((box_size,box_size))
+white_threat_box.fill(white_threat)
+
+class SquareState(Enum):
+    NORMAL = 0
+    SELECTED = 1
+    MOVE = 2 
+    THREAT =3
 
 class ChessPiece:
     def __init__(self, color, name, x, y):
@@ -59,22 +84,32 @@ def loadPieces():
 
 pieces=loadPieces()
 
-def drawBox(screen,x,y,selected):
-    if not selected:
+def drawBox(screen,x,y,state):
+    if state == SquareState.NORMAL:
         if (x+y) % 2:
             screen.blit(black_box,(x*box_size,y*box_size))
         else:
             screen.blit(white_box,(x*box_size,y*box_size))
-    else:
+    elif state == SquareState.SELECTED:
         if (x+y) % 2:
             screen.blit(black_selected_box,(x*box_size,y*box_size))
         else:
             screen.blit(white_selected_box,(x*box_size,y*box_size))
+    elif state == SquareState.MOVE:
+        if (x+y) % 2:
+            screen.blit(black_move_box,(x*box_size,y*box_size))
+        else:
+            screen.blit(white_move_box,(x*box_size,y*box_size))
+    elif state == SquareState.THREAT:
+        if (x+y) % 2:
+            screen.blit(black_threat_box,(x*box_size,y*box_size))
+        else:
+            screen.blit(white_threat_box,(x*box_size,y*box_size))
 
 def displayBoard(screen):
     for i in range(8):
         for j in range(8):
-            drawBox(screen,j,i,False)
+            drawBox(screen,j,i,SquareState.NORMAL)
             pieceSymbol=board[i][j]
             if pieceSymbol != '':
                 piece=pieces[pieceSymbol]
@@ -84,7 +119,7 @@ def displayBoard(screen):
 
 def deSelectPiece(screen,cell_x,cell_y):
     pieceSymbol=board[cell_y][cell_x]
-    drawBox(screen,cell_x,cell_y,False)
+    drawBox(screen,cell_x,cell_y,SquareState.NORMAL)
     piece = pieces[pieceSymbol]
     piece.move_to(cell_x,cell_y)
     piece.drawPiece(screen)
@@ -92,7 +127,7 @@ def deSelectPiece(screen,cell_x,cell_y):
 def selectPiece(screen,cell_x,cell_y):
     pieceSymbol=board[cell_y][cell_x]
     if pieceSymbol != '':
-        drawBox(screen,cell_x,cell_y,True)
+        drawBox(screen,cell_x,cell_y,SquareState.SELECTED)
         piece = pieces[pieceSymbol]
         piece.move_to(cell_x,cell_y)
         piece.drawPiece(screen)
@@ -121,7 +156,7 @@ def selections(screen,selected):
 
 def movePiece(screen,current_loc, next_loc):
     curr_x,curr_y=current_loc
-    drawBox(screen,curr_x,curr_y,False)
+    drawBox(screen,curr_x,curr_y,SquareState.NORMAL)
     pieceSymbol = board[curr_y][curr_x]
     next_x,next_y=next_loc
     drawBox(screen,next_x,next_y,False)
