@@ -18,7 +18,6 @@ def checkValidCoordinates(x,y):
     return True
 
 def getBishopMoves(board, bishopLocation):
-    bish_x,bish_y=bishopLocation
     empty=[]
     enemy=[]
     for direction in [(1,1),(1,-1),(-1,-1),(-1,1)]:
@@ -37,4 +36,25 @@ def getBishopMoves(board, bishopLocation):
 
 def getBishopLegalMoves(board,bishopLocation):
     enemy,empty=getBishopLegalMoves(board,bishopLocation)
+    return enemy+empty
+
+def getRookMoves(board, rookLocation):
+    empty=[]
+    enemy=[]
+    for direction in [(1,0),(-1,0),(0,1),(0,-1)]:
+        mark_x,mark_y=rookLocation
+        dx,dy=direction
+        mark_x+=dx
+        mark_y+=dy
+        while checkValidCoordinates(mark_x,mark_y) and len(board[mark_y][mark_x])==0 :
+           empty.append((mark_x,mark_y))
+           mark_x+=dx
+           mark_y+=dy
+        if checkValidCoordinates(mark_x,mark_y):
+            if not checkFriendly(board,rookLocation,(mark_x,mark_y)):
+                enemy.append((mark_x,mark_y))
+    return empty,enemy
+
+def getRookLegalMoves(board,rookLocation):
+    enemy,empty=getRookLegalMoves(board,rookLocation)
     return enemy+empty
