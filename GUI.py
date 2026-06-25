@@ -117,12 +117,8 @@ def displayBoard(screen):
                 piece.drawPiece(screen)
 
 
-def deSelectPiece(screen,cell_x,cell_y):
-    pieceSymbol=board[cell_y][cell_x]
-    drawBox(screen,cell_x,cell_y,SquareState.NORMAL)
-    piece = pieces[pieceSymbol]
-    piece.move_to(cell_x,cell_y)
-    piece.drawPiece(screen)
+def deSelectPiece(screen):
+    displayBoard(screen)
 
 def selectPiece(screen,cell_x,cell_y):
     pieceSymbol=board[cell_y][cell_x]
@@ -131,6 +127,8 @@ def selectPiece(screen,cell_x,cell_y):
         piece = pieces[pieceSymbol]
         piece.move_to(cell_x,cell_y)
         piece.drawPiece(screen)
+        if board[cell_y][cell_x][1]=='b':
+            showBishopMoves(screen,(cell_x,cell_y))
         return cell_x,cell_y
 
 def selections(screen,selected):
@@ -141,11 +139,11 @@ def selections(screen,selected):
         if not selected:
            return selectPiece(screen,cell_x,cell_y)
         elif (cell_x,cell_y) == selected:
-            deSelectPiece(screen,cell_x,cell_y)
+            deSelectPiece(screen)
             return None
         else:
             old_x,old_y=selected
-            deSelectPiece(screen,old_x,old_y)
+            deSelectPiece(screen)
             if  len(board[cell_y][cell_x])>0 and board[cell_y][cell_x][0] == board[old_y][old_x][0]: 
                 return selectPiece(screen,cell_x,cell_y)
             else:
@@ -159,9 +157,21 @@ def movePiece(screen,current_loc, next_loc):
     drawBox(screen,curr_x,curr_y,SquareState.NORMAL)
     pieceSymbol = board[curr_y][curr_x]
     next_x,next_y=next_loc
-    drawBox(screen,next_x,next_y,False)
+    drawBox(screen,next_x,next_y,SquareState.NORMAL)
     piece=pieces[pieceSymbol]
     piece.move_to(next_x,next_y)
     piece.drawPiece(screen)
     backend.movePiece(board,current_loc,next_loc)
     
+def showBishopMoves(screen,bishopLocation):
+    empty_cell,enemy_cell=backend.getBishopMoves(board,bishopLocation)
+    for cell in empty_cell:
+        empty_x,empty_y=cell
+        drawBox(screen,empty_x,empty_y,SquareState.MOVE)
+    for cell in enemy_cell:
+        enemy_x,enemy_y=cell
+        pieceSymbol=board[enemy_y][enemy_x]
+        drawBox(screen,enemy_x,enemy_y,SquareState.THREAT)
+        piece=pieces[pieceSymbol]
+        piece.move_to(enemy_x,enemy_y)
+        piece.drawPiece(screen)
