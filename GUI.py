@@ -133,6 +133,10 @@ def selectPiece(screen,cell_x,cell_y):
             showPieceMoves(screen,(cell_x,cell_y),backend.getRookMoves)
         if board[cell_y][cell_x][1]=='q':
             showPieceMoves(screen,(cell_x,cell_y),backend.getQueenMoves)
+        if board[cell_y][cell_x][1]=='k':
+            showPieceMoves(screen,(cell_x,cell_y),backend.getKingMoves)
+        if board[cell_y][cell_x][1]=='n':
+            showPieceMoves(screen,(cell_x,cell_y),backend.getKnightMoves)
         return cell_x,cell_y
 
 def selections(screen,selected):
