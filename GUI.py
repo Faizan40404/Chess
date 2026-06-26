@@ -116,17 +116,7 @@ def displayBoard(screen):
                 piece.move_to(j,i)
                 piece.drawPiece(screen)
 
-
-def deSelectPiece(screen):
-    displayBoard(screen)
-
-def selectPiece(screen,cell_x,cell_y):
-    pieceSymbol=board[cell_y][cell_x]
-    if pieceSymbol != '':
-        drawBox(screen,cell_x,cell_y,SquareState.SELECTED)
-        piece = pieces[pieceSymbol]
-        piece.move_to(cell_x,cell_y)
-        piece.drawPiece(screen)
+def showMoves(screen,cell_x,cell_y):
         if board[cell_y][cell_x][1]=='b':
             showPieceMoves(screen,(cell_x,cell_y),backend.getBishopMoves)
         if board[cell_y][cell_x][1]=='r':
@@ -137,7 +127,23 @@ def selectPiece(screen,cell_x,cell_y):
             showPieceMoves(screen,(cell_x,cell_y),backend.getKingMoves)
         if board[cell_y][cell_x][1]=='n':
             showPieceMoves(screen,(cell_x,cell_y),backend.getKnightMoves)
+        if board[cell_y][cell_x][1]=='p':
+            showPieceMoves(screen,(cell_x,cell_y),backend.getPawnMoves)
+
+def selectPiece(screen,cell_x,cell_y):
+    pieceSymbol=board[cell_y][cell_x]
+    if pieceSymbol != '':
+        drawBox(screen,cell_x,cell_y,SquareState.SELECTED)
+        piece = pieces[pieceSymbol]
+        piece.move_to(cell_x,cell_y)
+        piece.drawPiece(screen)
+
+        showMoves(screen,cell_x,cell_y)
         return cell_x,cell_y
+
+
+def deSelectPiece(screen):
+    displayBoard(screen)
 
 def selections(screen,selected):
     mouse_x, mouse_y=pygame.mouse.get_pos()

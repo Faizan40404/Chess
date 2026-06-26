@@ -10,7 +10,7 @@ def checkFriendly(board,piece1_loc,piece2_loc):
     p2_x,p2_y=piece2_loc
     return True if board[p1_y][p1_x][0] == board[p2_y][p2_x][0] else False
 
-def checkValidCoordinates(x,y):
+def isCoordinateValid(x,y):
     if x<0 or x>7 or y<0 or y>7:
         return False
     return True
@@ -23,11 +23,11 @@ def getLinearMoves(board, pieceLocation, directionList):
         dx,dy=direction
         mark_x+=dx
         mark_y+=dy
-        while checkValidCoordinates(mark_x,mark_y) and len(board[mark_y][mark_x])==0 :
+        while isCoordinateValid(mark_x,mark_y) and len(board[mark_y][mark_x])==0 :
            empty.append((mark_x,mark_y))
            mark_x+=dx
            mark_y+=dy
-        if checkValidCoordinates(mark_x,mark_y):
+        if isCoordinateValid(mark_x,mark_y):
             if not checkFriendly(board,pieceLocation,(mark_x,mark_y)):
                 enemy.append((mark_x,mark_y))
     return empty,enemy
@@ -65,13 +65,10 @@ def getStepMoves(board, pieceLocation, directionList):
         dx,dy=direction
         mark_x+=dx
         mark_y+=dy
-        if checkValidCoordinates(mark_x,mark_y):
-            print(mark_x,mark_y)
+        if isCoordinateValid(mark_x,mark_y):
             if len(board[mark_y][mark_x])==0:
-                print('mn len mn aaya')
                 empty.append((mark_x,mark_y))
             elif not checkFriendly(board,pieceLocation,(mark_x,mark_y)):
-                print('mn check mn aaya')
                 enemy.append((mark_x,mark_y))
     return empty,enemy
 
@@ -90,3 +87,46 @@ def getKnightMoves(board, knightLocation):
 def getKnightPsuedolegalMoves(board,knightLocation):
     empty,enemy=getKingMoves(board,knightLocation)
     return empty+enemy
+
+def canPawnMoveTwoSteps(board, pawnLocation):
+    pawn_x,pawn_y=pawnLocation
+    if (board[pawn_y][pawn_x][0]=='w' and pawn_y==6) or (board[pawn_y][pawn_x][0]=='b' and pawn_y==1):
+        return True
+    else:
+        return False
+
+def createPawnMoves(board, pawnLocation,directionList):
+    enemy=[]
+    empty=[]
+    mark_x,mark_y=pawnLocation
+    dy=directionList[0][1]
+    mark_y+=dy
+    if isCoordinateValid(mark_x,mark_y):
+        if len(board[mark_y][mark_x])==0:
+            empty.append((mark_x,mark_y))
+            if canPawnMoveTwoSteps(board, pawnLocation):
+                mark_y+=dy
+                if isCoordinateValid(mark_x,mark_y):
+                    if len(board[mark_y][mark_x])==0:
+                        empty.append((mark_x,mark_y))
+    
+    for direction in directionList:
+        mark_x,mark_y=pawnLocation
+        dx,dy=direction
+        mark_x+=dx
+        mark_y+=dy
+        if isCoordinateValid(mark_x,mark_y):
+            if len(board[mark_y][mark_x])>0:
+                if not checkFriendly(board, pawnLocation,(mark_x,mark_y)):
+                    enemy.append((mark_x,mark_y))
+
+    return empty,enemy
+
+def getPawnMoves(board,pawnLocation):
+    pawn_x,pawn_y=pawnLocation
+    directionList=[]
+    if board[pawn_y][pawn_x][0]=='w':
+        directionList=[(-1,-1),(1,-1)]
+    else:
+        directionList=[(-1,1),(1,1)]
+    return createPawnMoves(board, pawnLocation,directionList)
