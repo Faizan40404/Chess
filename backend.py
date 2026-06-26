@@ -54,7 +54,7 @@ def getQueenMoves(board, queenLocation):
     return getLinearMoves(board,queenLocation,directions)
 
 def getQueenPsuedolegalMoves(board,queenLocation):
-    enemy,empty=getRookMoves(board,queenLocation)
+    enemy,empty=getQueenMoves(board,queenLocation)
     return enemy+empty
 
 def getStepMoves(board, pieceLocation, directionList):
@@ -85,7 +85,7 @@ def getKnightMoves(board, knightLocation):
     return getStepMoves(board, knightLocation,directions)
 
 def getKnightPsuedolegalMoves(board,knightLocation):
-    empty,enemy=getKingMoves(board,knightLocation)
+    empty,enemy=getKnightMoves(board,knightLocation)
     return empty+enemy
 
 def canPawnMoveTwoSteps(board, pawnLocation):
@@ -130,3 +130,22 @@ def getPawnMoves(board,pawnLocation):
     else:
         directionList=[(-1,1),(1,1)]
     return createPawnMoves(board, pawnLocation,directionList)
+
+def getPawnPsuedolegalMoves(board, pawnLocation):
+    empty,enemy=getPawnMoves(board,pawnLocation)
+    return empty+enemy
+
+def getPiecePsuedoLegalMoves(board, pieceLocation):
+    piece_x,piece_y=pieceLocation
+    if board[piece_y][piece_x][1]=='p':
+        return getPawnPsuedolegalMoves(board,pieceLocation)
+    elif board[piece_y][piece_x][1]=='k':
+        return getKingPsuedolegalMoves(board,pieceLocation)
+    elif board[piece_y][piece_x][1]=='q':
+        return getQueenPsuedolegalMoves(board,pieceLocation)
+    elif board[piece_y][piece_x][1]=='n':
+        return getKnightPsuedolegalMoves(board,pieceLocation)
+    elif board[piece_y][piece_x][1]=='r':
+        return getRookPsuedolegalMoves(board,pieceLocation)
+    elif board[piece_y][piece_x][1]=='b':
+        return getBishopPsuedolegalMoves(board,pieceLocation)

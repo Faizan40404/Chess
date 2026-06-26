@@ -167,15 +167,18 @@ def selections(screen,selected):
     return None  
 
 def movePiece(screen,current_loc, next_loc):
-    curr_x,curr_y=current_loc
-    drawBox(screen,curr_x,curr_y,SquareState.NORMAL)
-    pieceSymbol = board[curr_y][curr_x]
-    next_x,next_y=next_loc
-    drawBox(screen,next_x,next_y,SquareState.NORMAL)
-    piece=pieces[pieceSymbol]
-    piece.move_to(next_x,next_y)
-    piece.drawPiece(screen)
-    backend.movePiece(board,current_loc,next_loc)
+    if next_loc in backend.getPiecePsuedoLegalMoves(board,current_loc):
+        curr_x,curr_y=current_loc
+        drawBox(screen,curr_x,curr_y,SquareState.NORMAL)
+        pieceSymbol = board[curr_y][curr_x]
+        next_x,next_y=next_loc
+        drawBox(screen,next_x,next_y,SquareState.NORMAL)
+        piece=pieces[pieceSymbol]
+        piece.move_to(next_x,next_y)
+        piece.drawPiece(screen)
+        backend.movePiece(board,current_loc,next_loc)
+    else:
+        deSelectPiece(screen)
 
 def showPieceMoves(screen,pieceLocation, getPieceMoves):
     empty_cell,enemy_cell=getPieceMoves(board,pieceLocation)
