@@ -132,41 +132,43 @@ def showMoves(screen,cell_x,cell_y):
 
 def selectPiece(screen,cell_x,cell_y):
     pieceSymbol=board[cell_y][cell_x]
-    if pieceSymbol != '':
-        drawBox(screen,cell_x,cell_y,SquareState.SELECTED)
-        piece = pieces[pieceSymbol]
-        piece.move_to(cell_x,cell_y)
-        piece.drawPiece(screen)
 
-        showMoves(screen,cell_x,cell_y)
-        return cell_x,cell_y
+    drawBox(screen,cell_x,cell_y,SquareState.SELECTED)
+    piece = pieces[pieceSymbol]
+    piece.move_to(cell_x,cell_y)
+    piece.drawPiece(screen)
+
+    showMoves(screen,cell_x,cell_y)
+    return cell_x,cell_y
 
 
 def deSelectPiece(screen):
     displayBoard(screen)
 
-def selections(screen,selected):
+def selections(screen,selected,turn):
     mouse_x, mouse_y=pygame.mouse.get_pos()
     cell_y=int(mouse_y / box_size)
     cell_x=int(mouse_x / box_size)
     if cell_x < 8 and cell_y<8:
         if not selected:
-           return selectPiece(screen,cell_x,cell_y)
+           if board[cell_y][cell_x]!='':
+                if backend.isMyTurn(board,(cell_x,cell_y),turn):  
+                    return selectPiece(screen,cell_x,cell_y),turn
         elif (cell_x,cell_y) == selected:
             deSelectPiece(screen)
-            return None
+            return None,turn
         else:
             old_x,old_y=selected
             deSelectPiece(screen)
             if  len(board[cell_y][cell_x])>0 and board[cell_y][cell_x][0] == board[old_y][old_x][0]: 
-                return selectPiece(screen,cell_x,cell_y)
+                return selectPiece(screen,cell_x,cell_y),turn
             else:
-                movePiece(screen,selected,(cell_x,cell_y))
-                return None
+                return None,movePiece(screen,selected,(cell_x,cell_y),turn)
+                
             
-    return None  
+    return None,turn
 
-def movePiece(screen,current_loc, next_loc):
+def movePiece(screen,current_loc, next_loc,turn):
     if next_loc in backend.getPiecePsuedoLegalMoves(board,current_loc):
         curr_x,curr_y=current_loc
         drawBox(screen,curr_x,curr_y,SquareState.NORMAL)
@@ -176,9 +178,10 @@ def movePiece(screen,current_loc, next_loc):
         piece=pieces[pieceSymbol]
         piece.move_to(next_x,next_y)
         piece.drawPiece(screen)
-        backend.movePiece(board,current_loc,next_loc)
+        return backend.movePiece(board,current_loc,next_loc,turn)
     else:
         deSelectPiece(screen)
+        return turn
 
 def showPieceMoves(screen,pieceLocation, getPieceMoves):
     empty_cell,enemy_cell=getPieceMoves(board,pieceLocation)

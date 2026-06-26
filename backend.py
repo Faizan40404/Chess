@@ -1,9 +1,18 @@
-def movePiece(board, current_loc, next_loc):
+def isMyTurn(board,pieceLocation,turn):
+    piece_x,piece_y=pieceLocation
+    if (turn==1 and board[piece_y][piece_x][0]=='w') or (turn==0 and board[piece_y][piece_x][0]=='b'):
+        return True
+    else:
+        return False
+def movePiece(board, current_loc, next_loc,turn):
     curr_x,curr_y=current_loc
     pieceSymbol=board[curr_y][curr_x]
     next_x,next_y=next_loc
     board[next_y][next_x]=pieceSymbol
     board[curr_y][curr_x]=""
+
+    turn^=1
+    return turn
 
 def checkFriendly(board,piece1_loc,piece2_loc):
     p1_x,p1_y=piece1_loc
