@@ -4,7 +4,7 @@ from sys import exit
 
 pygame.init()
 
-width=800
+width=825
 height=600
 
 

@@ -4,6 +4,27 @@ def isMyTurn(board,pieceLocation,turn):
         return True
     else:
         return False
+
+def pawnToPromote(board):
+    if 'wp' in board[0] or 'bp' in board[7]:
+        return True
+    return False
+
+def whichPawnToPromote(board):
+    x=0
+    for pieceSymbol in board[0]:
+        if pieceSymbol != '':
+            if pieceSymbol[1]=='p':
+                return x,0
+        x+=1
+    x=0
+    for pieceSymbol in board[7]:
+        if pieceSymbol != '':
+            if pieceSymbol[1]=='p':
+                return x,7
+        x+=1
+
+
 def movePiece(board, current_loc, next_loc,turn):
     curr_x,curr_y=current_loc
     pieceSymbol=board[curr_y][curr_x]
