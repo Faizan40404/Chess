@@ -54,6 +54,10 @@ white_move_box.fill(white_move)
 white_threat_box=pygame.Surface((box_size,box_size))
 white_threat_box.fill(white_threat)
 
+trajan_pro=pygame.font.Font('Fonts/trajan-pro/TrajanPro-Bold.otf',40)
+title_surface=trajan_pro.render('Shatranj',True,font_color)
+title_rect=title_surface.get_rect(midtop=(712,20))
+
 class SquareState(Enum):
     NORMAL = 0
     SELECTED = 1
@@ -93,9 +97,6 @@ def displayMenu(screen):
     background_rect=background_img.get_rect(topleft = (600,0))
     screen.blit(background_img,background_rect)
 
-    trajan_pro=pygame.font.Font('Fonts/trajan-pro/TrajanPro-Bold.otf',40)
-    title_surface=trajan_pro.render('Shatranj',True,font_color)
-    title_rect=title_surface.get_rect(midtop=(712,20))
     screen.blit(title_surface,title_rect)
 
 
@@ -133,21 +134,21 @@ def displayBoard(screen):
 
     displayMenu(screen)
 
-def showMoves(screen,cell_x,cell_y):
+def showMoves(screen,cell_x,cell_y,turn):
         if board[cell_y][cell_x][1]=='b':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getBishopMoves)
+            showPieceMoves(screen,(cell_x,cell_y),backend.getBishopMoves,turn)
         if board[cell_y][cell_x][1]=='r':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getRookMoves)
+            showPieceMoves(screen,(cell_x,cell_y),backend.getRookMoves,turn)
         if board[cell_y][cell_x][1]=='q':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getQueenMoves)
+            showPieceMoves(screen,(cell_x,cell_y),backend.getQueenMoves,turn)
         if board[cell_y][cell_x][1]=='k':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getKingMoves)
+            showPieceMoves(screen,(cell_x,cell_y),backend.getKingMoves,turn)
         if board[cell_y][cell_x][1]=='n':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getKnightMoves)
+            showPieceMoves(screen,(cell_x,cell_y),backend.getKnightMoves,turn)
         if board[cell_y][cell_x][1]=='p':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getPawnMoves)
+            showPieceMoves(screen,(cell_x,cell_y),backend.getPawnMoves,turn)
 
-def selectPiece(screen,cell_x,cell_y):
+def selectPiece(screen,cell_x,cell_y,turn):
     pieceSymbol=board[cell_y][cell_x]
 
     drawBox(screen,cell_x,cell_y,SquareState.SELECTED)
@@ -155,7 +156,7 @@ def selectPiece(screen,cell_x,cell_y):
     piece.move_to(cell_x,cell_y)
     piece.drawPiece(screen)
 
-    showMoves(screen,cell_x,cell_y)
+    showMoves(screen,cell_x,cell_y,turn)
     return cell_x,cell_y
 
 
@@ -171,7 +172,7 @@ def selections(screen,selected,turn):
             if not selected:
                 if board[cell_y][cell_x]!='':
                     if backend.isMyTurn(board,(cell_x,cell_y),turn):  
-                        return selectPiece(screen,cell_x,cell_y),turn
+                        return selectPiece(screen,cell_x,cell_y,turn),turn
             elif (cell_x,cell_y) == selected:
                 deSelectPiece(screen)
                 return None,turn
@@ -179,7 +180,7 @@ def selections(screen,selected,turn):
                 old_x,old_y=selected
                 deSelectPiece(screen)
                 if  len(board[cell_y][cell_x])>0 and board[cell_y][cell_x][0] == board[old_y][old_x][0]: 
-                    return selectPiece(screen,cell_x,cell_y),turn
+                    return selectPiece(screen,cell_x,cell_y,turn),turn
                 else:
                     return None,movePiece(screen,selected,(cell_x,cell_y),turn)
     else:
@@ -188,8 +189,7 @@ def selections(screen,selected,turn):
             loc_x,loc_y=location
             board[loc_y][loc_x]=pieceSymbol
             deSelectPiece(screen)
-                
-            
+
     return None,turn
 
 def showPromotionPieces(screen,pieceLocation):
@@ -224,11 +224,10 @@ def checkPromotionPiece():
             return color+'n',(pawn_x,pawn_y)
         elif box_y==4:
             return color+'b',(pawn_x,pawn_y)
-    else:
-        return None,None
+    return None,None
 
 def movePiece(screen,current_loc, next_loc,turn):
-    if next_loc in backend.getPiecePsuedoLegalMoves(board,current_loc):
+    if next_loc in backend.getPiecePsuedoLegalMoves(board,current_loc,turn):
         curr_x,curr_y=current_loc
         drawBox(screen,curr_x,curr_y,SquareState.NORMAL)
         pieceSymbol = board[curr_y][curr_x]
@@ -237,18 +236,25 @@ def movePiece(screen,current_loc, next_loc,turn):
         piece=pieces[pieceSymbol]
         piece.move_to(next_x,next_y)
         piece.drawPiece(screen)
+
         turn=backend.movePiece(board,current_loc,next_loc,turn)
 
         if backend.pawnToPromote(board):
             showPromotionPieces(screen,next_loc)
+
+        list=backend.kingInCheck(board,turn)
+        if len(list):
+            print(list)
+        else:
+            print(False)
 
         return turn
     else:
         deSelectPiece(screen)
         return turn
 
-def showPieceMoves(screen,pieceLocation, getPieceMoves):
-    empty_cell,enemy_cell=getPieceMoves(board,pieceLocation)
+def showPieceMoves(screen,pieceLocation, getPieceMoves,turn):
+    empty_cell,enemy_cell=getPieceMoves(board,pieceLocation,turn)
     for cell in empty_cell:
         empty_x,empty_y=cell
         drawBox(screen,empty_x,empty_y,SquareState.MOVE)

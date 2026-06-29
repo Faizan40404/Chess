@@ -1,8 +1,8 @@
-import GUI
 import pygame
 from sys import exit
 
 pygame.init()
+import GUI
 
 width=825
 height=600
