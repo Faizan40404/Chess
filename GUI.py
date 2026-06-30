@@ -2,6 +2,7 @@ import pygame
 import backend
 from enum import Enum
 
+
 board = [
     ["br","bn","bb","bq","bk","bb","bn","br"],
     ["bp","bp","bp","bp","bp","bp","bp","bp"],
@@ -28,7 +29,6 @@ white_threat = (255, 160, 160)
 black_threat = (200, 80, 80)
 
 font_color= (200, 162, 74)
-
 
 black_box=pygame.Surface((box_size,box_size))
 black_box.fill(black)
@@ -58,12 +58,14 @@ trajan_pro=pygame.font.Font('Fonts/trajan-pro/TrajanPro-Bold.otf',40)
 title_surface=trajan_pro.render('Shatranj',True,font_color)
 title_rect=title_surface.get_rect(midtop=(712,20))
 
+# State for Each Square
 class SquareState(Enum):
     NORMAL = 0
     SELECTED = 1
     MOVE = 2 
     THREAT =3
 
+# Piece Class contains color, name, image, rect
 class ChessPiece:
     def __init__(self, color, name, x, y):
         self.color=color
@@ -78,7 +80,9 @@ class ChessPiece:
     def move_to(self,x,y):
         self.rect.topleft=(x*box_size+5,y*box_size+5)
         
-
+# Loads All pieces, stores and returns in dictionary
+# 'pieceSymbol': ChessPiece
+# pieceSymbol -> 2 chars where char[0]->color char[1]->piece
 def loadPieces():
     pieces={}
 
@@ -91,6 +95,9 @@ def loadPieces():
 
 pieces=loadPieces()
 
+# Displays:
+#   1. Background Image
+#   2. Title
 def displayMenu(screen):
     background_img=pygame.image.load('Images/Background/background.png').convert_alpha()
     background_img=pygame.transform.smoothscale(background_img,(225,600))
@@ -99,7 +106,7 @@ def displayMenu(screen):
 
     screen.blit(title_surface,title_rect)
 
-
+# Draws each box with different colors based on position, selection, move, or threat
 def drawBox(screen,x,y,state):
     if state == SquareState.NORMAL:
         if (x+y) % 2:
@@ -122,6 +129,7 @@ def drawBox(screen,x,y,state):
         else:
             screen.blit(white_threat_box,(x*box_size,y*box_size))
 
+# Draws the 2d Box for chess board and the menu
 def displayBoard(screen):
     for i in range(8):
         for j in range(8):
@@ -134,6 +142,9 @@ def displayBoard(screen):
 
     displayMenu(screen)
 
+# Selects the piece by highlighting it and showing its legal moves
+#
+# Returns (selectedPieceLocation)
 def selectPiece(screen,cell_x,cell_y,turn):
     pieceSymbol=board[cell_y][cell_x]
 
@@ -145,10 +156,22 @@ def selectPiece(screen,cell_x,cell_y,turn):
     showPieceMoves(screen,(cell_x,cell_y),turn)
     return cell_x,cell_y
 
-
+# Deselects a Piece by drawing the window all over again
 def deSelectPiece(screen):
     displayBoard(screen)
 
+# Decides what to do when left click happens based on rules
+# 1. If no pawn to promote
+#   1.1. If click happens and:
+#       1.1.1. Nothing is already selected then selects the clicked cell if a piece is there and its that colors turn
+#       1.1.2. Clicked cell is same as already selected one then deselects 
+#       1.1.3. Clicked cell is not same as already selected cell:
+#           1.1.3.1. Clicked cell is empty or enemy then tries to move there
+#           1.1.3.2. Clicked cell is friendly then selects clicked cell
+# 2. If no pawn to promote:
+#   2.1. Check which piece to promote the pawn to
+#
+# Returns (selectedPieceLocation, turn)
 def selections(screen,selected,turn):
     mouse_x, mouse_y=pygame.mouse.get_pos()
     cell_y=int(mouse_y / box_size)
@@ -182,6 +205,7 @@ def selections(screen,selected,turn):
 
     return None,turn
 
+# Draws the options to promote the pawn to
 def showPromotionPieces(screen,pieceLocation):
     draw_x=9
     draw_y=1
@@ -198,6 +222,9 @@ def showPromotionPieces(screen,pieceLocation):
         draw_y+=1
 
 
+# Checks which piece has the player decided to promote the pawn to
+#
+# Returns (pieceSymbol,promotedPawnLocation)
 def checkPromotionPiece():
     pawn_x,pawn_y=backend.whichPawnToPromote(board)
     promotionPawn=board[pawn_y][pawn_x]
@@ -216,6 +243,14 @@ def checkPromotionPiece():
             return color+'b',(pawn_x,pawn_y)
     return None,None
 
+# Tries to move a piece from 1 cell to other
+# 1. If move is legal:
+#   1.1. Moves Piece Visually
+#   1.2. Asks Backend to move the piece in the list
+# 2. If move is not legal:
+#   2.1. Deselects the piece
+#
+# Returns (turn)
 def movePiece(screen,current_loc, next_loc,turn):
     if next_loc in backend.getLegalPieceMoves(board,current_loc,turn):
         curr_x,curr_y=current_loc
@@ -244,6 +279,7 @@ def movePiece(screen,current_loc, next_loc,turn):
         deSelectPiece(screen)
         return turn
 
+# Shows all legal moves of the required piece. Both Empty and enemy cell highlighted with different colors
 def showPieceMoves(screen,pieceLocation,turn):
     empty_cell,enemy_cell=backend.getLegalPieceMovesSeperately(board,pieceLocation,turn)
     for cell in empty_cell:
