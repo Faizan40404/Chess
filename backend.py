@@ -67,28 +67,28 @@ def getLinearMoves(board, pieceLocation, directionList,turn):
     return empty,enemy
 
 
-def getBishopMoves(board, bishopLocation,turn):
+def getBishopMovesSeperately(board, bishopLocation,turn):
     directions=[(1,1),(1,-1),(-1,-1),(-1,1)]
     return getLinearMoves(board,bishopLocation,directions,turn)
 
-def getBishopPsuedolegalMoves(board,bishopLocation,turn):
-    enemy,empty=getBishopMoves(board,bishopLocation,turn)
+def getBishopMoves(board,bishopLocation,turn):
+    enemy,empty=getBishopMovesSeperately(board,bishopLocation,turn)
     return enemy+empty
 
-def getRookMoves(board, rookLocation,turn):
+def getRookMovesSeperately(board, rookLocation,turn):
     directions=[(1,0),(-1,0),(0,1),(0,-1)]
     return getLinearMoves(board,rookLocation,directions,turn)
 
-def getRookPsuedolegalMoves(board,rookLocation,turn):
-    enemy,empty=getRookMoves(board,rookLocation,turn)
+def getRookMoves(board,rookLocation,turn):
+    enemy,empty=getRookMovesSeperately(board,rookLocation,turn)
     return enemy+empty
 
-def getQueenMoves(board, queenLocation,turn):
+def getQueenMovesSeperately(board, queenLocation,turn):
     directions = [(1,0),(-1,0),(0,1),(0,-1),(1,1),(1,-1),(-1,-1),(-1,1)]
     return getLinearMoves(board,queenLocation,directions,turn)
 
-def getQueenPsuedolegalMoves(board,queenLocation,turn):
-    enemy,empty=getQueenMoves(board,queenLocation,turn)
+def getQueenMoves(board,queenLocation,turn):
+    enemy,empty=getQueenMovesSeperately(board,queenLocation,turn)
     return enemy+empty
 
 def getStepMoves(board, pieceLocation, directionList,turn):
@@ -106,20 +106,20 @@ def getStepMoves(board, pieceLocation, directionList,turn):
                 enemy.append((mark_x,mark_y))
     return empty,enemy
 
-def getKingMoves(board, kingLocation,turn):
+def getKingMovesSeperately(board, kingLocation,turn):
     directions=[(1,0),(-1,0),(0,1),(0,-1),(1,1),(1,-1),(-1,-1),(-1,1)]
     return getStepMoves(board, kingLocation,directions,turn)
 
-def getKingPsuedolegalMoves(board,kingLocation,turn):
-    empty,enemy=getKingMoves(board,kingLocation,turn)
+def getKingMoves(board,kingLocation,turn):
+    empty,enemy=getKingMovesSeperately(board,kingLocation,turn)
     return empty+enemy
 
-def getKnightMoves(board, knightLocation,turn):
+def getKnightMovesSeperately(board, knightLocation,turn):
     directions=[(1,2),(1,-2),(-1,2),(-1,-2),(2,1),(2,-1),(-2,1),(-2,-1)]
     return getStepMoves(board, knightLocation,directions,turn)
 
-def getKnightPsuedolegalMoves(board,knightLocation,turn):
-    empty,enemy=getKnightMoves(board,knightLocation,turn)
+def getKnightMoves(board,knightLocation,turn):
+    empty,enemy=getKnightMovesSeperately(board,knightLocation,turn)
     return empty+enemy
 
 def canPawnMoveTwoSteps(board, pawnLocation,turn):
@@ -157,7 +157,7 @@ def createPawnMoves(board, pawnLocation,directionList,turn):
 
     return empty,enemy
 
-def getPawnMoves(board,pawnLocation,turn):
+def getPawnMovesSeperately(board,pawnLocation,turn):
     directionList=[]
     color='w' if turn else 'b'
     if color=='w':
@@ -166,48 +166,48 @@ def getPawnMoves(board,pawnLocation,turn):
         directionList=[(-1,1),(1,1)]
     return createPawnMoves(board, pawnLocation,directionList,turn)
 
-def getPawnPsuedolegalMoves(board, pawnLocation,turn):
-    empty,enemy=getPawnMoves(board,pawnLocation,turn)
+def getPawnMoves(board, pawnLocation,turn):
+    empty,enemy=getPawnMovesSeperately(board,pawnLocation,turn)
     return empty+enemy
 
-def getPieceMoves(board,pieceLocation,turn):
+def getPieceMovesSeperately(board,pieceLocation,turn):
     p_x,p_y=pieceLocation
     if board[p_y][p_x][1]=='b':
-        return getBishopMoves(board,pieceLocation,turn)
+        return getBishopMovesSeperately(board,pieceLocation,turn)
     elif board[p_y][p_x][1]=='r':
-        return getRookMoves(board,pieceLocation,turn)
+        return getRookMovesSeperately(board,pieceLocation,turn)
     elif board[p_y][p_x][1]=='q':
-        return getQueenMoves(board,pieceLocation,turn)
+        return getQueenMovesSeperately(board,pieceLocation,turn)
     elif board[p_y][p_x][1]=='k':
-        return getKingMoves(board,pieceLocation,turn)
+        return getKingMovesSeperately(board,pieceLocation,turn)
     elif board[p_y][p_x][1]=='n':
-        return getKnightMoves(board,pieceLocation,turn)
+        return getKnightMovesSeperately(board,pieceLocation,turn)
     elif board[p_y][p_x][1]=='p':
-        return getPawnMoves(board,pieceLocation,turn)
+        return getPawnMovesSeperately(board,pieceLocation,turn)
 
-def getPiecePsuedoLegalMoves(board, pieceLocation,turn):
+def getPieceMoves(board, pieceLocation,turn):
     piece_x,piece_y=pieceLocation
     if board[piece_y][piece_x][1]=='p':
-        return getPawnPsuedolegalMoves(board,pieceLocation,turn)
+        return getPawnMoves(board,pieceLocation,turn)
     elif board[piece_y][piece_x][1]=='k':
-        return getKingPsuedolegalMoves(board,pieceLocation,turn)
+        return getKingMoves(board,pieceLocation,turn)
     elif board[piece_y][piece_x][1]=='q':
-        return getQueenPsuedolegalMoves(board,pieceLocation,turn)
+        return getQueenMoves(board,pieceLocation,turn)
     elif board[piece_y][piece_x][1]=='n':
-        return getKnightPsuedolegalMoves(board,pieceLocation,turn)
+        return getKnightMoves(board,pieceLocation,turn)
     elif board[piece_y][piece_x][1]=='r':
-        return getRookPsuedolegalMoves(board,pieceLocation,turn)
+        return getRookMoves(board,pieceLocation,turn)
     elif board[piece_y][piece_x][1]=='b':
-        return getBishopPsuedolegalMoves(board,pieceLocation,turn)
+        return getBishopMoves(board,pieceLocation,turn)
 
-def squareInCheck(board,squareLocation,turn):
+def cellInCheck(board,squareLocation,turn):
     color='w' if turn else 'b'
     opposite='b' if color=='w' else 'w'
-    _,bishop_enemy=getBishopMoves(board,squareLocation,turn)
-    _,rook_enemy=getRookMoves(board,squareLocation,turn)
-    _,knight_enemy=getKnightMoves(board,squareLocation,turn)
-    _,king_enemy=getKingMoves(board,squareLocation,turn)
-    _,pawn_enemy=getPawnMoves(board,squareLocation,turn)
+    _,bishop_enemy=getBishopMovesSeperately(board,squareLocation,turn)
+    _,rook_enemy=getRookMovesSeperately(board,squareLocation,turn)
+    _,knight_enemy=getKnightMovesSeperately(board,squareLocation,turn)
+    _,king_enemy=getKingMovesSeperately(board,squareLocation,turn)
+    _,pawn_enemy=getPawnMovesSeperately(board,squareLocation,turn)
     checkFrom=[]
     for location in bishop_enemy:
         loc_x,loc_y=location
@@ -246,7 +246,7 @@ def findMyKing(board,turn):
 
 def kingInCheck(board,turn):
     i,j=findMyKing(board,turn)
-    return squareInCheck(board,(i,j),turn)
+    return cellInCheck(board,(i,j),turn)
 
 def movePieceTemporarily(board,current_loc,next_loc):
     curr_x,curr_y=current_loc
@@ -266,7 +266,7 @@ def undoTempMove(board,current_loc,next_loc,previousOccupier):
     board[curr_y][curr_x]=previousOccupier
 
 def getLegalPieceMovesSeperately(board,pieceLocation,turn):
-    empty,enemy=getPieceMoves(board,pieceLocation,turn)
+    empty,enemy=getPieceMovesSeperately(board,pieceLocation,turn)
 
     legalEmpty=[]
     legalEnemy=[]
@@ -305,7 +305,7 @@ def getAllLegalMoves(board,turn):
 
 def isCheckMate(board,turn):
     king_x,king_y=findMyKing(board,turn)
-    if  len(squareInCheck(board,(king_x,king_y),turn))>0:
+    if  len(cellInCheck(board,(king_x,king_y),turn))>0:
         legal_moves=getAllLegalMoves(board,turn)
         if len(legal_moves)==0:
             return True
@@ -313,7 +313,7 @@ def isCheckMate(board,turn):
 
 def isStaleMate(board,turn):
     king_x,king_y=findMyKing(board,turn)
-    if  len(squareInCheck(board,(king_x,king_y),turn))==0:
+    if  len(cellInCheck(board,(king_x,king_y),turn))==0:
         legal_moves=getAllLegalMoves(board,turn)
         if len(legal_moves)==0:
             return True
