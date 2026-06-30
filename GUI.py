@@ -134,20 +134,6 @@ def displayBoard(screen):
 
     displayMenu(screen)
 
-def showMoves(screen,cell_x,cell_y,turn):
-        if board[cell_y][cell_x][1]=='b':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getBishopMoves,turn)
-        if board[cell_y][cell_x][1]=='r':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getRookMoves,turn)
-        if board[cell_y][cell_x][1]=='q':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getQueenMoves,turn)
-        if board[cell_y][cell_x][1]=='k':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getKingMoves,turn)
-        if board[cell_y][cell_x][1]=='n':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getKnightMoves,turn)
-        if board[cell_y][cell_x][1]=='p':
-            showPieceMoves(screen,(cell_x,cell_y),backend.getPawnMoves,turn)
-
 def selectPiece(screen,cell_x,cell_y,turn):
     pieceSymbol=board[cell_y][cell_x]
 
@@ -156,7 +142,7 @@ def selectPiece(screen,cell_x,cell_y,turn):
     piece.move_to(cell_x,cell_y)
     piece.drawPiece(screen)
 
-    showMoves(screen,cell_x,cell_y,turn)
+    showPieceMoves(screen,(cell_x,cell_y),turn)
     return cell_x,cell_y
 
 
@@ -227,7 +213,7 @@ def checkPromotionPiece():
     return None,None
 
 def movePiece(screen,current_loc, next_loc,turn):
-    if next_loc in backend.getPiecePsuedoLegalMoves(board,current_loc,turn):
+    if next_loc in backend.getAllLegalMoves(board,current_loc,turn):
         curr_x,curr_y=current_loc
         drawBox(screen,curr_x,curr_y,SquareState.NORMAL)
         pieceSymbol = board[curr_y][curr_x]
@@ -242,19 +228,13 @@ def movePiece(screen,current_loc, next_loc,turn):
         if backend.pawnToPromote(board):
             showPromotionPieces(screen,next_loc)
 
-        list=backend.kingInCheck(board,turn)
-        if len(list):
-            print(list)
-        else:
-            print(False)
-
         return turn
     else:
         deSelectPiece(screen)
         return turn
 
-def showPieceMoves(screen,pieceLocation, getPieceMoves,turn):
-    empty_cell,enemy_cell=getPieceMoves(board,pieceLocation,turn)
+def showPieceMoves(screen,pieceLocation,turn):
+    empty_cell,enemy_cell=backend.getLegalMovesSeperately(board,pieceLocation,turn)
     for cell in empty_cell:
         empty_x,empty_y=cell
         drawBox(screen,empty_x,empty_y,SquareState.MOVE)

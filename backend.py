@@ -123,7 +123,7 @@ def getKnightPsuedolegalMoves(board,knightLocation,turn):
     return empty+enemy
 
 def canPawnMoveTwoSteps(board, pawnLocation,turn):
-    pawn_x,pawn_y=pawnLocation
+    _,pawn_y=pawnLocation
     color='w' if turn else 'b'
     if (color=='w' and pawn_y==6) or (color=='b' and pawn_y==1):
         return True
@@ -169,6 +169,21 @@ def getPawnMoves(board,pawnLocation,turn):
 def getPawnPsuedolegalMoves(board, pawnLocation,turn):
     empty,enemy=getPawnMoves(board,pawnLocation,turn)
     return empty+enemy
+
+def getPieceMoves(board,pieceLocation,turn):
+    p_x,p_y=pieceLocation
+    if board[p_y][p_x][1]=='b':
+        return getBishopMoves(board,pieceLocation,turn)
+    elif board[p_y][p_x][1]=='r':
+        return getRookMoves(board,pieceLocation,turn)
+    elif board[p_y][p_x][1]=='q':
+        return getQueenMoves(board,pieceLocation,turn)
+    elif board[p_y][p_x][1]=='k':
+        return getKingMoves(board,pieceLocation,turn)
+    elif board[p_y][p_x][1]=='n':
+        return getKnightMoves(board,pieceLocation,turn)
+    elif board[p_y][p_x][1]=='p':
+        return getPawnMoves(board,pieceLocation,turn)
 
 def getPiecePsuedoLegalMoves(board, pieceLocation,turn):
     piece_x,piece_y=pieceLocation
@@ -222,10 +237,51 @@ def squareInCheck(board,squareLocation,turn):
 
     return checkFrom
 
-def kingInCheck(board,turn):
+def findMyKing(board,turn):
     color='w' if turn else 'b'
     for i in range(8):
         for j in range(8):
             if board[j][i]==color+'k':
-                print(i,j)
-                return squareInCheck(board,(i,j),turn)
+                return i,j
+
+def kingInCheck(board,turn):
+    i,j=findMyKing(board,turn)
+    return squareInCheck(board,(i,j),turn)
+
+def movePieceTemporarily(board,current_loc,next_loc):
+    curr_x,curr_y=current_loc
+    pieceSymbol=board[curr_y][curr_x]
+    next_x,next_y=next_loc
+    previousOccupier=board[next_y][next_x]
+    board[next_y][next_x]=pieceSymbol
+    board[curr_y][curr_x]=""
+
+    return previousOccupier
+
+def undoTempMove(board,current_loc,next_loc,previousOccupier):
+    curr_x,curr_y=current_loc
+    pieceSymbol=board[curr_y][curr_x]
+    next_x,next_y=next_loc
+    board[next_y][next_x]=pieceSymbol
+    board[curr_y][curr_x]=previousOccupier
+
+def getLegalMovesSeperately(board,pieceLocation,turn):
+    empty,enemy=getPieceMoves(board,pieceLocation,turn)
+
+    legalEmpty=[]
+    legalEnemy=[]
+    for emptyCell in empty:
+        previousOccupier=movePieceTemporarily(board,pieceLocation,emptyCell)
+        if len(kingInCheck(board,turn))==0:
+            legalEmpty.append(emptyCell)
+        undoTempMove(board,emptyCell,pieceLocation,previousOccupier)
+    for enemyCell in enemy:
+        previousOccupier=movePieceTemporarily(board,pieceLocation,enemyCell)
+        if len(kingInCheck(board,turn))==0:
+            legalEnemy.append(enemyCell)
+        undoTempMove(board,enemyCell,pieceLocation,previousOccupier)
+    return legalEmpty,legalEnemy
+
+def getAllLegalMoves(board,pieceLocation,turn):
+    empty,enemy=getLegalMovesSeperately(board,pieceLocation,turn)
+    return empty+enemy
