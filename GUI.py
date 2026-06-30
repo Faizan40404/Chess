@@ -95,6 +95,25 @@ def loadPieces():
 
 pieces=loadPieces()
 
+# Shows personalized game end messages for checkmate and stalemate
+def showGameEndMessage(screen,winnerTurn):
+    font_color=white if winnerTurn==1 else black
+    message_font=pygame.font.Font('Fonts/trajan-pro/TrajanPro-Bold.otf',30)
+    if winnerTurn==1:
+        font_color=white
+        message_surface=message_font.render('White wins',True,font_color)
+        message_rect=message_surface.get_rect(midtop=(712,95))
+    elif winnerTurn==0:
+        font_color=black
+        message_surface=message_font.render('Black wins',True,font_color)
+        message_rect=message_surface.get_rect(midtop=(712,95))
+    else:
+        font_color=(200, 162, 74)
+        message_surface=message_font.render('Stalemate',True,font_color)
+        message_rect=message_surface.get_rect(midtop=(712,95))
+    screen.blit(message_surface,message_rect)
+
+
 # Displays:
 #   1. Background Image
 #   2. Title
@@ -199,9 +218,9 @@ def selections(screen,selected,turn):
             board[loc_y][loc_x]=pieceSymbol
             deSelectPiece(screen)
             if backend.isCheckMate(board,turn):
-                print('CheckMate')
+                showGameEndMessage(screen, turn^1)
             elif backend.isStaleMate(board,turn):
-                print('StaleMate')
+                showGameEndMessage(screen, -1)
 
     return None,turn
 
@@ -268,10 +287,10 @@ def movePiece(screen,current_loc, next_loc,turn):
             showPromotionPieces(screen,next_loc)
 
         if backend.isCheckMate(board,turn):
-            print('CheckMate')
+            showGameEndMessage(screen, turn^1)
             return turn
         elif backend.isStaleMate(board,turn):
-            print('StaleMate')
+            showGameEndMessage(screen, -1)
             return turn
 
         return turn
