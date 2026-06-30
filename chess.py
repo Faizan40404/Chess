@@ -12,6 +12,9 @@ height=600
 screen=pygame.display.set_mode((width,height))
 pygame.display.set_caption('Shatranj')
 
+icon=pygame.image.load('Images/Pieces/black/knight.png')
+pygame.display.set_icon(icon)
+
 GUI.displayBoard(screen)
 selected=tuple()
 turn = 1

@@ -265,7 +265,7 @@ def undoTempMove(board,current_loc,next_loc,previousOccupier):
     board[next_y][next_x]=pieceSymbol
     board[curr_y][curr_x]=previousOccupier
 
-def getLegalMovesSeperately(board,pieceLocation,turn):
+def getLegalPieceMovesSeperately(board,pieceLocation,turn):
     empty,enemy=getPieceMoves(board,pieceLocation,turn)
 
     legalEmpty=[]
@@ -282,6 +282,39 @@ def getLegalMovesSeperately(board,pieceLocation,turn):
         undoTempMove(board,enemyCell,pieceLocation,previousOccupier)
     return legalEmpty,legalEnemy
 
-def getAllLegalMoves(board,pieceLocation,turn):
-    empty,enemy=getLegalMovesSeperately(board,pieceLocation,turn)
+def getLegalPieceMoves(board,pieceLocation,turn):
+    empty,enemy=getLegalPieceMovesSeperately(board,pieceLocation,turn)
     return empty+enemy
+
+def getAllLegalMovesSeperately(board,turn):
+    color='w' if turn else 'b'
+    legalEmpty=[]
+    legalEnemy=[]
+    for i in range(8):
+        for j in range(8):
+            if board[j][i]!='' and board[j][i][0]==color:
+                empty,enemy=getLegalPieceMovesSeperately(board,(i,j),turn)
+                legalEnemy+=enemy
+                legalEmpty+=empty
+    return legalEmpty,legalEnemy
+
+def getAllLegalMoves(board,turn):
+    legalEmpty,legalEnemy=getAllLegalMovesSeperately(board,turn)
+    return legalEmpty+legalEnemy
+
+
+def isCheckMate(board,turn):
+    king_x,king_y=findMyKing(board,turn)
+    if  len(squareInCheck(board,(king_x,king_y),turn))>0:
+        legal_moves=getAllLegalMoves(board,turn)
+        if len(legal_moves)==0:
+            return True
+    return False
+
+def isStaleMate(board,turn):
+    king_x,king_y=findMyKing(board,turn)
+    if  len(squareInCheck(board,(king_x,king_y),turn))==0:
+        legal_moves=getAllLegalMoves(board,turn)
+        if len(legal_moves)==0:
+            return True
+    return False

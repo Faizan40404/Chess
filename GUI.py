@@ -175,6 +175,10 @@ def selections(screen,selected,turn):
             loc_x,loc_y=location
             board[loc_y][loc_x]=pieceSymbol
             deSelectPiece(screen)
+            if backend.isCheckMate(board,turn):
+                print('CheckMate')
+            elif backend.isStaleMate(board,turn):
+                print('StaleMate')
 
     return None,turn
 
@@ -213,7 +217,7 @@ def checkPromotionPiece():
     return None,None
 
 def movePiece(screen,current_loc, next_loc,turn):
-    if next_loc in backend.getAllLegalMoves(board,current_loc,turn):
+    if next_loc in backend.getLegalPieceMoves(board,current_loc,turn):
         curr_x,curr_y=current_loc
         drawBox(screen,curr_x,curr_y,SquareState.NORMAL)
         pieceSymbol = board[curr_y][curr_x]
@@ -228,13 +232,20 @@ def movePiece(screen,current_loc, next_loc,turn):
         if backend.pawnToPromote(board):
             showPromotionPieces(screen,next_loc)
 
+        if backend.isCheckMate(board,turn):
+            print('CheckMate')
+            return turn
+        elif backend.isStaleMate(board,turn):
+            print('StaleMate')
+            return turn
+
         return turn
     else:
         deSelectPiece(screen)
         return turn
 
 def showPieceMoves(screen,pieceLocation,turn):
-    empty_cell,enemy_cell=backend.getLegalMovesSeperately(board,pieceLocation,turn)
+    empty_cell,enemy_cell=backend.getLegalPieceMovesSeperately(board,pieceLocation,turn)
     for cell in empty_cell:
         empty_x,empty_y=cell
         drawBox(screen,empty_x,empty_y,SquareState.MOVE)
